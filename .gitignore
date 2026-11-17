@@ -1,0 +1,18 @@
+# Gerçek token ve chat ID burada; GitHub'a gitmemeli.
+# Örnek için ayarlar.example.toml dosyasına bak.
+ayarlar.toml
+
+# Botun çalışırken oluşturduğu veritabanı
+veri/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Diğer
+*.log
+.env
+.DS_Store
+Thumbs.db

@@ -1,0 +1,133 @@
+# KAP Bot ayarları (örnek dosya)
+# Kullanmak için bu dosyayı ayarlar.toml adıyla kopyala ve token / chat ID'yi doldur:
+#   cp ayarlar.example.toml ayarlar.toml      (Windows: copy ayarlar.example.toml ayarlar.toml)
+# ayarlar.toml .gitignore'da, GitHub'a gitmez. Bu örnek dosyaya gerçek token yazma.
+# Bu dosyayı değiştirdikten sonra botu yeniden başlat:  sudo systemctl restart kap-bot
+
+[telegram]
+# Telegram'da @BotFather'dan aldığın token (ör. "123456789:AAH...")
+bot_token = ""
+
+# Mesajların gideceği sohbetin ID'si. Bulmak için:  python bot.py --chat-id
+# Birden fazla yere göndermek için:  chat_id = ["123456789", "-1001234567890"]
+chat_id = ""
+
+# Gönderim şekli:
+#   "gunluk" -> her gün ozet_saati'nde, son özetten bu yana yakalanan bildirimler
+#               tek bir özet mesajı olarak gelir
+#   "anlik"  -> her bildirim KAP'ta yayımlandığı anda ayrı mesaj olarak gelir
+gonderim = "gunluk"
+
+# Günlük özetin saati (Türkiye saati). Birden fazla olabilir: ["09:00", "18:30"]
+ozet_saati = ["09:55", "18:30"]
+
+# Bu başlıklardaki bildirimler özetin sonunda "Diğer bildirimler" altında tek satır
+# olarak listelenir (sayıları çok, özeti uzatmasınlar diye). Detaylı görmek için sil.
+ozette_kisa_konular = [
+  "Pay Alım Satım Bildirimi",
+  "Kar Payı Dağıtım İşlemlerine İlişkin Bildirim",
+  "Kayıtlı Sermaye Tavanı İşlemlerine İlişkin Bildirim",
+]
+
+# (Sadece "anlik" modda) Bu saatler arasında mesajlar yine anında gelir ama telefon
+# ses/titreşim yapmaz. Kapatmak için boş bırak:  sessiz_saatler = ""
+sessiz_saatler = "23:00-08:00"
+
+
+[kap]
+# KAP'ı kaç saniyede bir kontrol etsin. 30 iyi bir değer; 15'in altına inilmez.
+kontrol_araligi_sn = 30
+
+
+[filtre]
+# Büyük/küçük harf ve Türkçe karakter farkı önemli değil ("SÖZLEŞME" = "sozlesme").
+
+# Bu konu başlığındaki ÖDA'lar her zaman gönderilir.
+her_zaman_gonder = [
+  "Yeni İş İlişkisi",
+  "İhale Süreci / Sonucu",
+  "Finansal Duran Varlık Satışı",
+  "Maddi Duran Varlık Satımı",
+  "Maddi Duran Varlık Kiraya Verilmesi veya Ayni Hak Tesisi",
+  # Sermaye artırımı (bedelli, bedelsiz, tahsisli; YK kararı, SPK onayı, tescil aşamaları)
+  "Sermaye Artırımı - Azaltımı İşlemlerine İlişkin Bildirim",
+  "Sermaye Artırımı veya Azaltımı Bildirimi",
+  "Kayıtlı Sermaye Tavanı İşlemlerine İlişkin Bildirim",
+  # Kâr payı (temettü) dağıtma / dağıtmama kararları ve tarihleri
+  "Kar Payı Dağıtım İşlemlerine İlişkin Bildirim",
+  # Şirketlerin başka şirket paylarını alması; yöneticilerin, ortakların ve portföy
+  # yönetim şirketlerinin pay alım-satımları da bu başlıkta gelir
+  "Pay Alım Satım Bildirimi",
+  # Şirketin bir şey satın alması (para çıkışı). İstersen başındaki # işaretini kaldır:
+  # "Finansal Duran Varlık Edinimi",
+  # "Maddi Duran Varlık Alımı",
+]
+
+# Bu konu başlığındaki ÖDA'lar hiç gönderilmez (özetinde anahtar kelime geçse bile).
+asla_gonderme = [
+  "Payların Geri Alınmasına İlişkin Bildirim",
+  "Geri Alınan Payların Elden Çıkarılması",
+  "Pay Dışında Sermaye Piyasası Aracı İşlemlerine İlişkin Bildirim (Faiz İçeren)",
+  "Pay Dışında Sermaye Piyasası Aracı İşlemlerine İlişkin Bildirim (Faizsiz)",
+  "Yatırım Kuruluşu Varant - Sertifika - Senetlerine İlişkin Bildirim",
+  "İhraç Tavanına İlişkin Bildirim",
+  "Kredi Derecelendirmesi",
+  "Kurumsal Yönetim İlkelerine Uyum Derecelendirmesi",
+  "Genel Kurul İşlemlerine İlişkin Bildirim",
+  "Genel Kurul Bildirimi",
+  "Esas Sözleşme Tadili",
+  "Kar Dağıtım Politikası",
+  "Yönetim Kurulu Komiteleri",
+  "Bağımsız Denetim Kuruluşunun Belirlenmesi",
+  "Şirket Merkezi Değişikliği",
+  "Unvan Değişikliği",
+  "Bilgilendirme Politikası",
+]
+
+# Diğer başlıklarda (çoğunlukla "Özel Durum Açıklaması (Genel)") bildirimin özetinde
+# bu kelimelerden biri geçerse gönderilir. Kelimenin başı yeterli: "sözleşme" yazınca
+# "sözleşmesi", "sözleşmenin" de yakalanır.
+anahtar_kelimeler = [
+  # sözleşme / anlaşma
+  "sözleşme", "anlaşma", "mutabakat", "protokol", "imzala", "term sheet", "niyet mektubu",
+  # iş / sipariş / ihale
+  # (tek başına "ihracat" yazma: birçok şirket unvanında "İthalat İhracat" geçiyor)
+  "iş ilişkisi", "iş birliği", "işbirliği", "sipariş", "ihale", "tedarik", "ihracat bağlantı",
+  "distribütör", "bayilik", "lisans", "ortak girişim", "konsorsiyum", "yeni müşteri",
+  # şirkete para girişi
+  "tahsil", "hakediş", "hibe", "teşvik", "gelir paylaşım",
+  "gayrimenkul satış", "taşınmaz satış", "arsa satış", "iştirak satış",
+  "bağlı ortaklık satış", "varlık satış", "tesis satış", "fabrika satış",
+  # yatırım (tek başına "yatırım" yazma: "Yatırımcı İlişkileri", "... Yatırım Ortaklığı" da yakalanır)
+  "yatırımı", "yatırımları", "yatırım kararı", "yeni yatırım", "kapasite artış",
+  "yeni fabrika", "yeni tesis", "projesi", "yeka", "halka arz",
+  # proje finansmanı / kredi
+  "proje finansman", "finansman sağla", "finansman temin", "kredi kullan", "kredi temin",
+  "sendikasyon",
+  # sermaye artırımı ("Genel" başlıkla yapılan duyurular için)
+  "sermaye artırım", "sermaye arttırım", "sermaye artışı", "tahsisli", "bedelli", "bedelsiz",
+  "sermaye avans",
+]
+
+# Bu ifadelerden biri geçerse anahtar kelime olsa bile gönderilmez.
+haric_kelimeler = [
+  "esas sözleşme",
+  "ana sözleşme",
+  "anlaşmazlık",
+  "varlık finansmanı fonu",
+]
+
+# Özeti boş ya da sadece "Özel Durum Açıklaması (Genel)" yazan bildirimlerde
+# karar vermek için bildirimin tam metnini okusun mu?
+ozet_bossa_metne_bak = true
+
+# Sadece bu hisseleri takip et (boş bırakırsan hepsi). Ör: ["ASELS", "THYAO"]
+sadece_hisseler = []
+
+# Bu hisseleri hiç gönderme. Ör: ["XYZ"]
+haric_hisseler = []
+
+# Unvanında bunlar geçen şirketlerin bildirimleri gönderilmez. Portföy yönetim şirketleri
+# fonlarının bir hissedeki payı eşik geçince bildirim yapıyor; metin yasal kalıp, asıl
+# bilgi (hangi hisse, ne kadar) sadece ekteki PDF'te.
+haric_sirketler = ["portföy yönetimi"]
